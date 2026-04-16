@@ -1,0 +1,30 @@
+2m Air Surface Temperature Historical Maps:
+
+
+On the right, we see cooler KSC temperatures in relation to the surrounding area. There is a large radiative flux or differential heating difference between the land and ocean. The land’s surface heats, but the ocean heats deeper with a higher heat capacity and vertical mixing from currents. This large heating difference between the land and sea drives sea breezes which cool Florida’s eastern coast, especially in the summer season. This sea breeze has two flows, one cooler surface sea breeze and one warmer wind returning to the ocean aloft. While this occurs, the greater AMOC ocean circulation system and Gulf Stream drive warm and salty tropical surface water northwards along Florida’s eastern coast, creating warmer temperatures that the sea breeze moderates.
+
+On the left, we have warmer KSC temperatures in the early morning. Warm, moist Atlantic Ocean air currents heat typically cooler early morning temperatures. Warm, moist conditions from the Atlantic Ocean also increase chances of afternoon or evening thunderstorms which likely impacted this early morning launch window. 
+
+
+2m Air Surface Temperature Model Comparison Maps:
+
+
+These maps compare predicted 2m surface temperatures for the Artemis II splashdown window from the Global Forecast System and High-Resolution Rapid Refresh models. The same surface temperature for both models over the ocean near the splashdown location for 60 miles off the coast indicates high stability and accuracy between the GFS model with longer-term forecasting and the HRRR model with short-term forecasting. The HRRR model ended up being more accurate for this small-scale analysis with 3km spatial resolution and hourly updates. It is specifically designed for up to 48 hour forecasts. The global model would be better for long-term forecasts with initiating up to 16 days, 6 hour updates, and 13km spatial resolution which creates the visibly larger pixel areas in the left map. 
+
+See: https://rapidrefresh.noaa.gov/hrrr/ - https://gribstream.com/models/gfs 
+
+
+CAPE and Lifting Indices Plot:
+
+
+Here I used CAPE or Convective Available Potential Energy (J/Kg, solid lines) and the best 4-layer surface lifting index values (degrees F, dashed lines), to help determine atmospheric stability and the likelihood of convection causing storms or lightning during the launches. 
+The amount of potential energy available to fuel thunderstorms can be understood through CAPE. This potential energy means an air parcel warmer than its surrounding will continue to rise and adiabatically cool with decreasing pressure. Then the air parcel becomes saturated and condenses into clouds while releasing latent heat to stay buoyant and rise further. So, the higher the CAPE value, the faster and more energetically the air parcel will rise, meaning a more unstable atmosphere with stronger updrafts with higher CAPE values. Lifting indices play into this by measuring the difference between the air temperature and the parcel’s temperature at 500mb (middle of troposphere storms). Positive indices mean a stable atmosphere, 0 to -3 is a little unstable, -3 to -6 is somewhat unstable, -6 to -9 is very unstable, and -9 or less is significantly unstable and even more likely to cause convection, lightning, clouds, and storms. Higher energy resulting in more instability. As CAPE increases, the lifting index decreases and larger temperature difference means more area for potential energy. The model picked the most unstable lower atmospheric layer to calculate the index.
+
+The Artemis I mission launched during a stabilizing atmosphere with low potential energy to fuel a thunderstorm and increased atmospheric stability between CAPE troughs after peaking early before 4am UTC. The Artemis II mission launched with increasing instability, a somewhat unstable lifting index and more potential energy available. They still launched as these are warnings of thunderstorm and lightning size or power. Variables like precipitation rates or cloud cover would further determine delays. Artemis II had the most unstable, volatile atmosphere in the morning to afternoon.
+See: https://www.weather.gov/ilx/swop-severetopics-CAPE - https://www.weather.gov/lmk/indices - https://www.nasa.gov/artemis-ii-weather-criteria/ 
+
+
+Wind Shear Plot: 
+
+
+From this vertical wind shear profile, the Artemis II splashdown window had the largest difference in wind shear or wind velocity per meter through the atmospheric pressure levels until the tropopause. Topopause being the boundary where the rising air parcels stop cooling and dry to not cause convection, storms, heat transfer with steady temperature before the stratosphere is reached with increasing temperature. The Artemis II splashdown window had about double the mission’s launch window wind shear intensity at 850 hPa or about 4900 ft above sea level, an important level for parachutes/weather balloons. It was also about 1.5x more intense wind shear than the Artemis I launch window at this height. The splashdown window also quadrupled the wind shear of the Artemis I launch window at 700 hPa and 500 hPa or about 10,000 ft and 18,000 ft above sea level (which are important levels to storm movement and stability). At 30,000 ft, the Artemis II splashdown wind shear was again 2.5x more intense than both Artemis I and II launches sharing about the same wind shear around the stratosphere boundary, also important for understanding jet streams and lift or drag on aircraft/rocket maneuvering). The Artemis I and II launches similarly had peak wind shear towards the surface around 850 hPa and around the tropopause boundary at 250 hPa.  With the rocket data, I would have liked to add Max Q, or max aerodynamic stress on the rocket during the wind shear intensities.
