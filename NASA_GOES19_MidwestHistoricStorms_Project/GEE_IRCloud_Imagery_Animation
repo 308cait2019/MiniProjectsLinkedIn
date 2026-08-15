@@ -1,0 +1,152 @@
+// Define Time Window (4pm ET to 4am ET is 20:00 to 08:00 UTC)
+var start = '2026-04-17T20:00:00';
+var end = '2026-04-18T08:00:00';
+
+// Load and Filter Full Img Collection
+var col = ee.ImageCollection('NOAA/GOES/19/MCMIPC')
+  .filterDate(start, end)
+  // GOES produces images every 5-10 mins; we filter 15 mins
+  .filter(ee.Filter.calendarRange(0, 15, 'minute')); 
+
+// Continent Borders
+var countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017");
+var states = ee.FeatureCollection("TIGER/2018/States");
+
+// Create an empty image and paint borders
+// Width: 1 pixel, Color: 1 (white)
+var borderImage = ee.Image().byte()
+  .paint(countries, 1, 1) // International borders
+  .paint(states, 1, 1);    // US State borders
+
+// Brightness Temperature Difference
+// Mask out low, thin clouds and ground heat to highlight only 
+// the "tallest" and most dangerous convective towers.
+
+
+
+
+
+
+// Visualization
+// raw data into RGB images for animating, using band 13 to make water vapor map with clouds
+var videoFrames = col.map(function(img) {
+  // Save timestamp 
+  var timestamp = img.get('system:time_start');
+  
+// BTD Calculation (Storm Intensity)
+  var btd = img.select('CMI_C13').subtract(img.select('CMI_C09'));
+  
+  // Create the base satellite image min/max are scaled integers, not deg K
+  // Since Band 13 and 9 are scaled by 10, difference is also scaled by 10
+  var mainVis = img.visualize({
+    bands: ['CMI_C08', 'CMI_C09', 'CMI_C13'],
+    min: 1864, 
+    max: 3341,
+    opacity: 1
+  });
+  
+  // Create a BTD overlay (Red/Yellow highlights for intense cores)
+  // Only shows over the strongest part of the storms w/ mask
+var btdVis = btd.visualize({
+    min: 0, 
+    max: 200, 
+    palette: ['#ff0000', '#ffff00', '#ffffff'], // Red to Yellow to White
+    opacity: 0.8
+  }).updateMask(btd.lt(200)); // Only show pixels with a difference of < 20 Kelvin
+  // where the smallest difference is showing the most instense, compact storms.
+  // This shows deep and high moisture cloud top convection reaching the tropopause (in red). 
+  // Small, narrow, bright yellow cores show powerful updrafts.
+  // As the IR cloud top animation shows rapidly expanding cooled clouds, this signals a 
+  // strengthening storm with potential for tornadoes.
+  
+  // Add border layer to vis
+  var borderVis = borderImage.visualize({palette: ['#ffffff'], opacity: 0.8});
+  // Combine the layers
+  var blended = mainVis.blend(btdVis).blend(borderVis);
+  // Put timestamp back on blended image
+  return blended.set('system:time_start', timestamp);
+});
+
+// Animation parameters
+var region = ee.Geometry.Rectangle([-125, 24, -66, 50]); // Rough CONUS bounding box
+var videoArgs = {
+  dimensions: 720, // width in pixels
+  region: region,
+  framesPerSecond: 4,
+  crs: 'EPSG:3857'
+};
+
+// Output
+// Check collection size before printing URL
+print(videoFrames.size())
+// print a URL to the Console.
+print('Click URL to see animation:', videoFrames.getVideoThumbURL(videoArgs));
+
+// Background Styling (From Static Map)
+var snazzyBlack = [
+  { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+  { elementType: 'labels', stylers: [{ visibility: 'off' }] },
+  { featureType: 'water', elementType: 'geometry.fill', stylers: [{ color: '#E4F7F7' }] },
+  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#4b6878' }, { weight: 1 }] }
+];
+Map.setOptions('DarkTheme', { 'DarkTheme': snazzyBlack });
+Map.setCenter(-98.57, 39.82, 4);
+
+// Add the first frame to the map to check
+Map.addLayer(videoFrames.first(), {}, 'First Animation Frame');
+
+
+
+
+
+
+
+// Export to Google Earth Pro for time-series
+
+// Convert collection into a format Google Earth likes, 
+// or export individual frames, with Drive.
+
+// Get server-side list of images and metadata
+var frameList = videoFrames.toList(videoFrames.size());
+
+// Get timestamps - Unix Epoch 1970 timstamp fix
+// Using .getNumber() instead of .get() forces Earth Engine to explicitly serialize 
+// the time metadata as a numeric value so .evaluate() doesn't lose it.
+var timestamps = frameList.map(function(img) {
+  return ee.Image(img).getNumber('system:time_start');
+});
+
+// Evaluate triggers a safe, asynchronous client-side callback once the server finishes computing
+timestamps.evaluate(function(timeList) {
+  print('Generating export tasks for ' + timeList.length + ' frames...');
+  
+  // Loop with timestamp array
+  for (var i = 0; i < timeList.length; i++) {
+    var image = ee.Image(frameList.get(i));
+    
+    // Construct the date string
+    var milliSeconds = parseInt(timeList[i], 10);
+    var jsDate = new Date(milliSeconds);
+    var year = jsDate.getUTCFullYear();
+    // Earth Engine compatible padding logic: add a leading zero and take the last two digits
+    var month = ('0' + (jsDate.getUTCMonth() + 1)).slice(-2);
+    var day = ('0' + jsDate.getUTCDate()).slice(-2);
+    var hours = ('0' + jsDate.getUTCHours()).slice(-2);
+    var minutes = ('0' + jsDate.getUTCMinutes()).slice(-2);
+    // Put date info together
+    // Add hyphens to be GEE compatible date string
+    var dateString = year + '-' + month + '-' + day + '_' + hours + minutes;
+    
+    Export.image.toDrive({
+      image: image,
+      description: 'GOES19_Frame_' + dateString,
+      folder: 'GEEWork',
+      scale: 4000, 
+      region: region,
+      fileFormat: 'GEOTIFF',
+      crs: 'EPSG:4326' // Reproject the imagery into unprojected Lat/Long coordinates first
+      // As the native Google Earth Pro projection
+    });
+  }
+  print('Check your "Tasks" tab on the right panel to click Run on your tasks!');
+});
