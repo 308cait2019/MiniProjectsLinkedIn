@@ -1,1 +1,1 @@
-Projects done after graduating posted to LinkedIn. # MiniProjectsLinkedIn
+Projects done after graduating and sometimes posted to LinkedIn. # MiniProjectsLinkedIn
